@@ -1,0 +1,29 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import ipywidgets as widgets
+
+
+def gbm(mu = 0.07, sigma = 0.15, month_per_year = 12, n_years = 10, n_scenarios = 100, s_0 = 100):
+  dt = 1 / month_per_year
+  n_steps = month_per_year * n_years
+  rets = np.random.normal(loc = ((1 + mu)**dt) - 1, scale = sigma * np.sqrt(dt), size = (n_steps, n_scenarios))
+  rets = pd.concat([pd.DataFrame(np.ones((1, n_scenarios))), pd.DataFrame(rets)], ignore_index = True)
+  return s_0 * ((1 + rets).cumprod())
+
+
+def interactive_gbm(mu = 0.07, sigma = 0.15, n_years = 10, n_scenarios = 100):
+  prices = gbm(mu = mu, sigma = sigma, n_years = n_years, n_scenarios = n_scenarios)
+  ax = prices.plot(legend = False, figsize = (12, 6))
+  ax.axhline(y = 200, ls = "--", color = "black")
+  plt.xlabel("Months")
+  plt.ylabel("Capital")
+  plt.title("Geometric Brownian Motion")
+
+widgets.interactive(interactive_gbm, mu = (-0.1, 0.1, 0.01), sigma = (0.05, 0.3, 0.01), n_years = (5, 30, 2), n_scenarios = (100, 1000, 100))
+
+
+
+
+
+
